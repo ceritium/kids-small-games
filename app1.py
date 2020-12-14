@@ -36,7 +36,7 @@ def sayFunc(phrase):
     engine = pyttsx3.init()
     engine.setProperty('rate', 160)
     if sys.platform == 'linux2':
-        engine.setProperty('voice', 'english')
+        engine.setProperty('voice', 'spanish')
 
     engine.say(phrase)
     engine.runAndWait()
