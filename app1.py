@@ -37,7 +37,6 @@ def sayFunc(phrase):
     engine.setProperty('rate', 160)
     if sys.platform == 'linux':
         engine.setProperty('voice', 'spanish')
-
     engine.say(phrase)
     engine.runAndWait()
 
