@@ -4,40 +4,47 @@ import urwid
 import pyttsx3
 import signal
 import sys
+import multiprocessing
 
-engine = pyttsx3.init()
-engine.setProperty('volume', 1.0)
+class Game:
+    def __init__(self):
+        self.text = "HOLA!"
+        self.txt = urwid.Text(self.text, align='center')
+        fill = urwid.Filler(self.txt, 'middle')
+        loop = urwid.MainLoop(fill, unhandled_input=self.handle_input)
+        loop.run()
 
-if sys.platform == 'linux2':
-    engine.setProperty('voice', 'english')
+    def say(self, text):
+        if __name__ == "__main__":
+            p = multiprocessing.Process(target=sayFunc, args=(text,))
+            p.start()
 
-text = u"HOLA!"
+    def handle_input(self, key):
+        if isinstance(key, str) or type(key) == 'unicode':
+            if key == 'enter':
+                if len(self.text) > 0:
+                    self.say(self.text)
+                    self.text = ""
+            elif key == 'backspace':
+                self.text = self.text[:-1]
+            else:
+                self.text = self.text + key
+
+        self.txt.set_text(self.text.upper())
+
+def sayFunc(phrase):
+    engine = pyttsx3.init()
+    engine.setProperty('rate', 160)
+    engine.say(phrase)
+    engine.runAndWait()
 
 def signal_handler(_sig, _frame):
-    print('Bye')
+    print('\nBye')
     sys.exit(0)
 
+def main():
+    signal.signal(signal.SIGINT, signal_handler)
+    Game()
 
-signal.signal(signal.SIGINT, signal_handler)
-
-def show_or_exit(key):
-    global text
-    if isinstance(text, str) or type(key) == 'unicode':
-        if key == 'enter':
-            if len(text) > 0:
-                engine.say(text)
-                engine.runAndWait()
-                text = ""
-        elif key == 'backspace':
-            text = text[:-1]
-        else:
-            text = text + key
-
-    txt.set_text(text.upper())
-
-txt = urwid.Text(text, align='center')
-fill = urwid.Filler(txt, 'middle')
-loop = urwid.MainLoop(fill, unhandled_input=show_or_exit)
-loop.run()
-
-
+if __name__=="__main__":
+    main()
