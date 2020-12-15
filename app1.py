@@ -7,7 +7,6 @@ import tempfile
 import os
 
 import urwid
-import playsound
 
 from gtts import gTTS
 
@@ -42,9 +41,8 @@ def sayFunc(phrase):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     filename = temp_file.name
     tts.save(filename)
-    playsound.playsound(filename)
+    os.system("mpg123 " + filename + " > /dev/null 2>&1")
     os.unlink(filename)
-
 
 def signal_handler(_sig, _frame):
     print('\nBye')
