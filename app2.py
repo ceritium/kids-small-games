@@ -4,17 +4,22 @@ import multiprocessing
 import random
 import signal
 import sys
-import urwid
-import pyttsx3
 import unicodedata
+import tempfile
+import os
 
-def sayFunc(phrase):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 100)
-    if sys.platform == 'linux':
-        engine.setProperty('voice', 'spanish')
-    engine.say(phrase)
-    engine.runAndWait()
+import urwid
+import playsound
+
+from gtts import gTTS
+
+def sayFunc(phrase, slow):
+    tts = gTTS(text=phrase, lang='es', slow=slow)
+    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    filename = temp_file.name
+    tts.save(filename)
+    playsound.playsound(filename)
+    os.unlink(filename)
 
 def signal_handler(_sig, _frame):
     print('\nBye')
@@ -32,6 +37,7 @@ class Game:
     def __init__(self):
         self.text = None
         self.word = None
+        self.slow = False
         self.txt = urwid.Text("", align='center')
         fill = urwid.Filler(self.txt, 'middle')
         self.loop = urwid.MainLoop(fill, unhandled_input=self.handle_input)
@@ -56,9 +62,9 @@ class Game:
         return [(color_bg, f" {string} ")]
 
     @classmethod
-    def say(cls, text):
+    def say(cls, text, slow):
         if __name__ == "__main__":
-            process = multiprocessing.Process(target=sayFunc, args=(text,))
+            process = multiprocessing.Process(target=sayFunc, args=(text, slow,))
             process.start()
 
     @classmethod
@@ -90,10 +96,15 @@ class Game:
         self.word = {'speak': word, 'screen': screen, 'challenge': challenge}
 
     def new_round(self):
+        self.slow = False
         self.new_challenge()
         self.text = self.word['challenge']
         self.txt.set_text(self.text)
-        Game.say(self.word['speak'])
+        Game.say(self.word['speak'], self.slow)
+
+    def toggle_slow(self):
+        self.slow = not self.slow
+        return self.slow
 
     def handle_input(self, key):
         if isinstance(key, str) and len(key) == 1:
@@ -106,7 +117,7 @@ class Game:
                 else:
                     self.txt.set_text(self.text_decorator(self.text, "error"))
                     self.loop.set_alarm_in(2, self.alarm_reset_text)
-                    Game.say(self.word['speak'])
+                    Game.say(self.word['speak'], self.toggle_slow())
 
 if __name__=="__main__":
     main()

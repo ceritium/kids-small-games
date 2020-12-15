@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
-import urwid
-import pyttsx3
 import signal
 import sys
 import multiprocessing
+import tempfile
+import os
+
+import urwid
+import playsound
+
+from gtts import gTTS
 
 class Game:
     def __init__(self):
@@ -33,12 +38,13 @@ class Game:
         self.txt.set_text(self.text.upper())
 
 def sayFunc(phrase):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 160)
-    if sys.platform == 'linux':
-        engine.setProperty('voice', 'spanish')
-    engine.say(phrase)
-    engine.runAndWait()
+    tts = gTTS(text=phrase, lang='es', slow=False)
+    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    filename = temp_file.name
+    tts.save(filename)
+    playsound.playsound(filename)
+    os.unlink(filename)
+
 
 def signal_handler(_sig, _frame):
     print('\nBye')
