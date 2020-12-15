@@ -5,20 +5,9 @@ import random
 import signal
 import sys
 import unicodedata
-import tempfile
-import os
 
 import urwid
-
-from gtts import gTTS
-
-def sayFunc(phrase, slow):
-    tts = gTTS(text=phrase, lang='es', slow=slow)
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
-    filename = temp_file.name
-    tts.save(filename)
-    os.system("mpg123 " + filename + " > /dev/null 2>&1")
-    os.unlink(filename)
+import utils
 
 def signal_handler(_sig, _frame):
     print('\nBye')
@@ -61,12 +50,6 @@ class Game:
         return [(color_bg, f" {string} ")]
 
     @classmethod
-    def say(cls, text, slow):
-        if __name__ == "__main__":
-            process = multiprocessing.Process(target=sayFunc, args=(text, slow,))
-            process.start()
-
-    @classmethod
     def replace_letter(cls, letter):
         if letter in Game.VOWELS and bool(random.getrandbits(1)):
             return Game.MISSING_LETTER
@@ -99,7 +82,7 @@ class Game:
         self.new_challenge()
         self.text = self.word['challenge']
         self.txt.set_text(self.text)
-        Game.say(self.word['speak'], self.slow)
+        utils.say(self.word['speak'], self.slow)
 
     def toggle_slow(self):
         self.slow = not self.slow
@@ -116,7 +99,7 @@ class Game:
                 else:
                     self.txt.set_text(self.text_decorator(self.text, "error"))
                     self.loop.set_alarm_in(2, self.alarm_reset_text)
-                    Game.say(self.word['speak'], self.toggle_slow())
+                    utils.say(self.word['speak'], self.toggle_slow())
 
 if __name__=="__main__":
     main()
