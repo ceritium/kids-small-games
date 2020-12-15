@@ -41,9 +41,6 @@ class Game:
         ]
 
     def __init__(self):
-        self.engine = pyttsx3.init()
-        self.engine.setProperty('volume', 1.0)
-
         self.text = None
         self.txt = urwid.Text("", align='center')
         fill = urwid.Filler(self.txt, 'middle')
@@ -81,19 +78,7 @@ class Game:
         self.say(self.pair[0])
 
     def handle_input(self, key):
-        if key == 'enter':
-            pass
-            # if self.waiting_for_enter:
-            #     self.new_round()
-            # else:
-            #     self.say(self.pair[0])
-            #     if self.pair[0] == self.text:
-            #         self.waiting_for_enter = True
-            #     else:
-            #         self.text = self.pair[1]
-            #         self.txt.set_text(self.text)
-            #
-        elif isinstance(key, str) or type(key) == 'unicode':
+        if isinstance(key, str) or type(key) == 'unicode':
             self.text = self.text.replace('_', key.upper(), 1)
             self.txt.set_text(self.text)
             if(not("_" in self.text)):
@@ -101,7 +86,6 @@ class Game:
                     self.txt.set_text(self.text_decorator(self.text, "success"))
                     self.loop.set_alarm_in(1, self.alarm_new_round)
                 else:
-                    # self.text = self.pair[1]
                     self.txt.set_text(self.text_decorator(self.text, "error"))
                     self.loop.set_alarm_in(2, self.alarm_reset_text)
                     self.say(self.pair[0])
