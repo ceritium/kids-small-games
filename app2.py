@@ -18,7 +18,7 @@ def sayFunc(phrase):
 class Game:
     DICT = [
             ('VERONICA', 'VER_NICA'),
-            ('VERÓNICA', 'V_R_N_C_'),
+            ('VERONICA', 'V_R_N_C_'),
             ('PAPA', 'PAP_'),
             ('MAMA', 'M_MA'),
             ('VERO', 'VER_'),
