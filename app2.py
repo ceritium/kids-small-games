@@ -9,7 +9,7 @@ import multiprocessing
 
 def sayFunc(phrase):
     engine = pyttsx3.init()
-    engine.setProperty('rate', 160)
+    engine.setProperty('rate', 100)
     if sys.platform == 'linux':
         engine.setProperty('voice', 'spanish')
     engine.say(phrase)
@@ -18,7 +18,7 @@ def sayFunc(phrase):
 class Game:
     DICT = [
             ('VERONICA', 'VER_NICA'),
-            ('VERONICA', 'V_R_N_C_'),
+            ('VERÓNICA', 'V_R_N_C_'),
             ('PAPA', 'PAP_'),
             ('MAMA', 'M_MA'),
             ('VERO', 'VER_'),
