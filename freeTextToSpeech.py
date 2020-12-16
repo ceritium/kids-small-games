@@ -26,7 +26,7 @@ class Game:
             ])
 
         self.txt = urwid.Text(self.text, align='center')
-        quote_filler = urwid.Filler(self.txt, valign='top', top=1, bottom=1)
+        quote_filler = urwid.Filler(self.txt, valign='middle', top=1, bottom=1)
         v_padding = urwid.Padding(quote_filler, left=1, right=1)
         quote_box = urwid.LineBox(v_padding)
 
