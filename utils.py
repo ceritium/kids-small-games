@@ -9,7 +9,7 @@ def sayFunc(phrase, slow=False):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     filename = temp_file.name
     tts.save(filename)
-    os.system("mpg123 " + filename + " > /dev/null 2>&1")
+    os.system("mpg123 -o pulse " + filename + " > /dev/null 2>&1")
     os.unlink(filename)
 
 def say(text, slow=False):
