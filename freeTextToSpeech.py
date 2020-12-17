@@ -2,13 +2,18 @@
 
 import signal
 import sys
-import multiprocessing
+import argparse
 
 import urwid
 import utils
 
 class Game:
-    def __init__(self):
+    def __init__(self, opts):
+        self.audio_options = {
+                'language': opts['audio_language'],
+                'module': opts['audio_module']
+                }
+
         self.text = "HOLA!"
 
         palette = [
@@ -41,7 +46,7 @@ class Game:
         if isinstance(key, str) or type(key) == 'unicode':
             if key == 'enter':
                 if len(self.text) > 0:
-                    utils.say(self.text)
+                    utils.say(self.text, audio_options=self.audio_options)
                     self.text = ""
             elif key == 'backspace':
                 self.text = self.text[:-1]
@@ -56,7 +61,17 @@ def signal_handler(_sig, _frame):
 
 def main():
     signal.signal(signal.SIGINT, signal_handler)
-    Game()
+
+    Game(vars(init_argparse().parse_args()))
+
+def init_argparse() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [OPTION] [FILE]...",
+        description="Print or check SHA1 (160-bit) checksums."
+    )
+    parser.add_argument("-am", "--audio-module")
+    parser.add_argument("-al", "--audio-language")
+    return parser
 
 
 if __name__ == "__main__":

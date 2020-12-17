@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
 
-import multiprocessing
 import random
 import signal
 import sys
 import unicodedata
+import argparse
 
 import urwid
 import utils
-
-def signal_handler(_sig, _frame):
-    print('\nBye')
-    sys.exit(0)
-
-def main():
-    signal.signal(signal.SIGINT, signal_handler)
-    Game()
 
 class Game:
     DICT = list(map(lambda x: x.strip().upper(), open('simple_words.txt').readlines()))
     MISSING_LETTER = '_'
     VOWELS = 'AEIOU'
 
-    def __init__(self):
+    def __init__(self, opts):
+        self.audio_options = {
+                'language': opts['audio_language'],
+                'module': opts['audio_module']
+                }
+
         self.text = None
         self.word = None
         self.slow = False
@@ -82,7 +79,7 @@ class Game:
         self.new_challenge()
         self.text = self.word['challenge']
         self.txt.set_text(self.text)
-        utils.say(self.word['speak'], self.slow)
+        utils.say(self.word['speak'], self.slow, audio_options=self.audio_options)
 
     def toggle_slow(self):
         self.slow = not self.slow
@@ -99,7 +96,26 @@ class Game:
                 else:
                     self.txt.set_text(self.text_decorator(self.text, "error"))
                     self.loop.set_alarm_in(2, self.alarm_reset_text)
-                    utils.say(self.word['speak'], self.toggle_slow())
+                    utils.say(self.word['speak'], self.toggle_slow(), audio_options=self.audio_options)
 
-if __name__=="__main__":
+
+def init_argparse() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [OPTION] [FILE]...",
+        description="Print or check SHA1 (160-bit) checksums."
+    )
+    parser.add_argument("-am", "--audio-module")
+    parser.add_argument("-al", "--audio-language")
+    return parser
+
+def signal_handler(_sig, _frame):
+    print('\nBye')
+    sys.exit(0)
+
+def main():
+    signal.signal(signal.SIGINT, signal_handler)
+    Game(vars(init_argparse().parse_args()))
+
+
+if __name__ == "__main__":
     main()
