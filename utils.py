@@ -1,6 +1,7 @@
 import tempfile
 import os
 import multiprocessing
+import sys
 
 from gtts import gTTS
 
@@ -22,3 +23,7 @@ def sayFunc(phrase, slow=False, audio_options = {}):
 def say(text, slow=False, audio_options={}):
     process = multiprocessing.Process(target=sayFunc, args=(text, slow, audio_options,))
     process.start()
+
+def signal_handler(_sig, _frame):
+    print('\nBye')
+    sys.exit(0)

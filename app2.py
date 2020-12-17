@@ -2,7 +2,6 @@
 
 import random
 import signal
-import sys
 import unicodedata
 import argparse
 
@@ -20,6 +19,10 @@ class Game:
                 'module': opts['audio_module']
                 }
 
+
+        self.dict = Game.parse_dict(opts['dictionary'] or 'simple_words.txt')
+
+        self.input_enabled = True
         self.text = None
         self.word = None
         self.slow = False
@@ -31,10 +34,16 @@ class Game:
         self.loop.run()
 
     @classmethod
+    def parse_dict(cls, dictionary):
+        return list(map(lambda x: x.strip().upper(), open(dictionary).readlines()))
+
+    @classmethod
     def strip_accents(cls, text):
+        text = text.replace('Ñ', '-&-')
         text = unicodedata.normalize('NFD', text)\
             .encode('ascii', 'ignore')\
             .decode("utf-8")
+        text = text.replace('-&-', 'Ñ')
         return str(text)
 
     @classmethod
@@ -60,6 +69,7 @@ class Game:
     def alarm_reset_text(self, _loop=None, _data=None):
         self.text = self.word['challenge']
         self.txt.set_text(self.text)
+        self.input_enabled = True
 
     def alarm_new_round(self, _loop=None, _data=None):
         self.new_round()
@@ -79,6 +89,7 @@ class Game:
         self.new_challenge()
         self.text = self.word['challenge']
         self.txt.set_text(self.text)
+        self.input_enabled = True
         utils.say(self.word['speak'], self.slow, audio_options=self.audio_options)
 
     def toggle_slow(self):
@@ -86,10 +97,11 @@ class Game:
         return self.slow
 
     def handle_input(self, key):
-        if isinstance(key, str) and len(key) == 1:
+        if self.input_enabled and isinstance(key, str) and len(key) == 1:
             self.text = self.text.replace(Game.MISSING_LETTER, key.upper(), 1)
             self.txt.set_text(self.text)
             if(not(Game.MISSING_LETTER in self.text)):
+                self.input_enabled = False
                 if self.word['screen'] == self.text:
                     self.txt.set_text(self.text_decorator(self.text, "success"))
                     self.loop.set_alarm_in(1, self.alarm_new_round)
@@ -101,19 +113,16 @@ class Game:
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [OPTION] [FILE]...",
-        description="Print or check SHA1 (160-bit) checksums."
+        usage="%(prog)s [OPTIONS]",
+        description="Simple TUI program for kids to complete missing vowels"
     )
     parser.add_argument("-am", "--audio-module")
     parser.add_argument("-al", "--audio-language")
+    parser.add_argument("-d", "--dictionary")
     return parser
 
-def signal_handler(_sig, _frame):
-    print('\nBye')
-    sys.exit(0)
-
 def main():
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, utils.signal_handler)
     Game(vars(init_argparse().parse_args()))
 
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import signal
-import sys
 import argparse
 
 import urwid
@@ -37,7 +36,6 @@ class Game:
 
         layout = urwid.Frame(header=header, body=quote_box, footer=menu)
 
-        # Create the event loop
         loop = urwid.MainLoop(
                 layout, palette, unhandled_input=self.handle_input)
         loop.run()
@@ -55,19 +53,15 @@ class Game:
 
         self.txt.set_text(self.text.upper())
 
-def signal_handler(_sig, _frame):
-    print('\nBye')
-    sys.exit(0)
-
 def main():
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, utils.signal_handler)
 
     Game(vars(init_argparse().parse_args()))
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [OPTION] [FILE]...",
-        description="Print or check SHA1 (160-bit) checksums."
+        usage="%(prog)s [OPTIONS]",
+        description="Simple TUI program for kids for writing and listening"
     )
     parser.add_argument("-am", "--audio-module")
     parser.add_argument("-al", "--audio-language")
