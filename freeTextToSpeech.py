@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# TODO:
+# - Añadir cursor
+# - guardar lo que escribe
+
 import signal
 import argparse
 
@@ -13,7 +17,7 @@ class Game:
                 'module': opts['audio_module']
                 }
 
-        self.text = "HOLA!"
+        self.text = "HOLA! "
 
         palette = [
             ('titlebar', 'black', 'white'),
@@ -29,16 +33,30 @@ class Game:
             u'Press (', ('quit button', u'CTRL-C'), u') to quit. ',
             ])
 
-        self.txt = urwid.Text(self.text, align='center')
+        self.txt = urwid.Text('', align='center')
         quote_filler = urwid.Filler(self.txt, valign='middle', top=1, bottom=1)
         v_padding = urwid.Padding(quote_filler, left=1, right=1)
         quote_box = urwid.LineBox(v_padding)
 
         layout = urwid.Frame(header=header, body=quote_box, footer=menu)
 
-        loop = urwid.MainLoop(
+        self.loop = urwid.MainLoop(
                 layout, palette, unhandled_input=self.handle_input)
-        loop.run()
+        self.underscore = True
+        self.alarm_update_text()
+        self.loop.run()
+
+    def alarm_update_text(self, _loop=None, _data=None):
+        if self.loop:
+            self.underscore = not self.underscore
+            text = self.text.upper()
+            if self.underscore:
+                text = text + '_'
+            else:
+                text = text + ' '
+
+            self.txt.set_text(text)
+            self.loop.set_alarm_in(1, self.alarm_update_text)
 
     def handle_input(self, key):
         if isinstance(key, str) or type(key) == 'unicode':
@@ -51,7 +69,8 @@ class Game:
             else:
                 self.text = self.text + key
 
-        self.txt.set_text(self.text.upper())
+            self.txt.set_text(self.text.upper() + '_')
+
 
 def main():
     signal.signal(signal.SIGINT, utils.signal_handler)

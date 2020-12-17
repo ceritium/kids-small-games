@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# TODO:
+# - pasar a los tres fallos
+# - escapar " "
+# - reinicar on enter
 
 import random
 import signal
@@ -9,7 +13,6 @@ import urwid
 import utils
 
 class Game:
-    DICT = list(map(lambda x: x.strip().upper(), open('simple_words.txt').readlines()))
     MISSING_LETTER = '_'
     VOWELS = 'AEIOU'
 
@@ -19,9 +22,7 @@ class Game:
                 'module': opts['audio_module']
                 }
 
-
         self.dict = Game.parse_dict(opts['dictionary'] or 'simple_words.txt')
-
         self.input_enabled = True
         self.text = None
         self.word = None
@@ -75,7 +76,7 @@ class Game:
         self.new_round()
 
     def new_challenge(self):
-        word = random.choice(Game.DICT)
+        word = random.choice(self.dict)
         screen = Game.strip_accents(word)
 
         challenge = Game.replace_word(screen)
