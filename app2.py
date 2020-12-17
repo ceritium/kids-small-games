@@ -98,10 +98,10 @@ class Game:
 
     def handle_input(self, key):
         if self.input_enabled and isinstance(key, str) and len(key) == 1:
+            self.input_enabled = False
             self.text = self.text.replace(Game.MISSING_LETTER, key.upper(), 1)
             self.txt.set_text(self.text)
             if(not(Game.MISSING_LETTER in self.text)):
-                self.input_enabled = False
                 if self.word['screen'] == self.text:
                     self.txt.set_text(self.text_decorator(self.text, "success"))
                     self.loop.set_alarm_in(1, self.alarm_new_round)
@@ -109,6 +109,8 @@ class Game:
                     self.txt.set_text(self.text_decorator(self.text, "error"))
                     self.loop.set_alarm_in(2, self.alarm_reset_text)
                     utils.say(self.word['speak'], self.toggle_slow(), audio_options=self.audio_options)
+            else:
+                self.input_enabled = True
 
 
 def init_argparse() -> argparse.ArgumentParser:
